@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Quiz Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1> Quiz Game</h1>
+        <p class="timer" id="timer">Time Left: 10s</p>
+        <div id="quiz">
+            <p class="question" id="question"></p>
+            <div id="options"></div>
+        </div>
+        <p class="result" id="result"></p>
+        <p class="score" id="score">Score: 0</p>
+    </div>
+<script>
+    const quizData = [
+        { question: "Which is the largest state in India by area?", options: ["Maharashtra", "Rajasthan", "Madhya Pradesh", "Uttar Pradesh"], answer: "Rajasthan" },
+        { question: "Which river is known as the 'Ganga of the South'?", options: ["Krishna", "Godavari", "Cauvery", "Narmada"], answer: "Godavari" },
+        { question: "Which is the highest mountain peak in India?", options: ["Kanchenjunga", "Nanda Devi", "K2", "Mount Everest"], answer: "Kanchenjunga" },
+        { question: "Which Indian state has the longest coastline?", options: ["Maharashtra", "Gujarat", "Tamil Nadu", "Andhra Pradesh"], answer: "Gujarat" },
+        { question: "What is the capital of Arunachal Pradesh?", options: ["Kohima", "Aizawl", "Itanagar", "Imphal"], answer: "Itanagar" },
+        { question: "Which is the only Indian state to share its border with Sikkim?", options: ["West Bengal", "Assam", "Meghalaya", "Nagaland"], answer: "West Bengal" },
+        { question: "Which is the largest freshwater lake in India?", options: ["Chilika Lake", "Wular Lake", "Dal Lake", "Loktak Lake"], answer: "Wular Lake" },
+        { question: "Which Indian state is known as the 'Land of Five Rivers'?", options: ["Uttar Pradesh", "Punjab", "Haryana", "Bihar"], answer: "Punjab" },
+        { question: "Which Indian city is called the 'City of Lakes'?", options: ["Jaipur", "Udaipur", "Bhopal", "Mysore"], answer: "Udaipur" },
+        { question: "Which is the southernmost point of India?", options: ["Indira Point", "Kanyakumari", "Rameshwaram", "Lakshadweep"], answer: "Indira Point" }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let timeLeft = 10;
+    let timer;
+
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const resultEl = document.getElementById("result");
+    const scoreEl = document.getElementById("score");
+    const timerEl = document.getElementById("timer");
+
+    function startTimer() {
+        timeLeft = 10;
+        timerEl.textContent = `Time Left: ${timeLeft}s`;
+        timer = setInterval(() => {
+            timeLeft--;
+            timerEl.textContent = `Time Left: ${timeLeft}s`;
+            if (timeLeft === 0) {
+                clearInterval(timer);
+                checkAnswer(null, true); // Indicating time up
+            }
+        }, 1000);
+    }
+
+    function loadQuestion() {
+        clearInterval(timer);
+        startTimer();
+
+        const q = quizData[currentQuestion];
+        questionEl.textContent = q.question;
+        questionEl.style.animation = "none";
+        void questionEl.offsetWidth;
+        questionEl.style.animation = "fadeIn 0.5s forwards";
+
+        optionsEl.innerHTML = "";
+        q.options.forEach((option, index) => {
+            const button = document.createElement("button");
+            button.textContent = option;
+            button.classList.add("option");
+            button.style.animationDelay = `${0.2 + index * 0.1}s`;
+            button.onclick = () => checkAnswer(option, false);
+            optionsEl.appendChild(button);
+        });
+    }
+
+    function checkAnswer(selected, timeUp) {
+        clearInterval(timer);
+
+        if (timeUp) {
+            resultEl.textContent = "Time's Up! The correct answer was: " + quizData[currentQuestion].answer;
+            resultEl.style.color = "orange";
+        } else if (selected === quizData[currentQuestion].answer) {
+            resultEl.textContent = "Correct!";
+            resultEl.style.color = "green";
+            score++;
+        } else {
+            resultEl.textContent = `Wrong! The correct answer was: ${quizData[currentQuestion].answer}`;
+            resultEl.style.color = "red";
+        }
+
+        resultEl.style.animation = "none";
+        void resultEl.offsetWidth;
+        resultEl.style.animation = "fadeIn 0.5s forwards";
+
+        scoreEl.textContent = `Score: ${score}`;
+
+        setTimeout(() => {
+            resultEl.textContent = "";
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                questionEl.textContent = "Quiz Completed!";
+                optionsEl.innerHTML = "";
+                timerEl.textContent = "";
+            }
+        }, 1500);
+    }
+
+    loadQuestion();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Quiz Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1> Quiz Game</h1>
+        <p class="timer" id="timer">Time Left: 10s</p>
+        <div id="quiz">
+            <p class="question" id="question"></p>
+            <div id="options"></div>
+        </div>
+        <p class="result" id="result"></p>
+        <p class="score" id="score">Score: 0</p>
+    </div>
+<script>
+    const quizData = [
+    { question: "What is 15 + 27?", options: ["32", "42", "52", "47"], answer: "42" },
+{ question: "What is 9 × 6?", options: ["45", "54", "63", "72"], answer: "54" },
+{ question: "What is the square root of 81?", options: ["7", "8", "9", "10"], answer: "9" },
+{ question: "If a triangle has angles of 60° and 60°, what is the measure of the third angle?", options: ["30°", "60°", "90°", "120°"], answer: "60°" },
+{ question: "What is 100 divided by 4?", options: ["20", "25", "30", "40"], answer: "25" },
+{ question: "What is the perimeter of a square with side length 5 cm?", options: ["10 cm", "15 cm", "20 cm", "25 cm"], answer: "20 cm" },
+{ question: "If a rectangle has a length of 10 cm and a width of 5 cm, what is its area?", options: ["15 cm²", "30 cm²", "40 cm²", "50 cm²"], answer: "50 cm²" },
+{ question: "What is 7 squared?", options: ["14", "21", "49", "77"], answer: "49" },
+{ question: "What is the sum of angles in a triangle?", options: ["90°", "120°", "180°", "360°"], answer: "180°" },
+{ question: "What is 5! (5 factorial)?", options: ["60", "100", "120", "150"], answer: "120" },
+{ question: "What is 25 × 4?", options: ["50", "75", "100", "125"], answer: "100" },
+{ question: "What is 144 ÷ 12?", options: ["10", "11", "12", "13"], answer: "12" },
+{ question: "What is the next prime number after 7?", options: ["9", "10", "11", "13"], answer: "11" },
+{ question: "If a number is divisible by 2 and 3, it must also be divisible by which number?", options: ["4", "5", "6", "8"], answer: "6" },
+{ question: "What is the smallest even number?", options: ["0", "1", "2", "4"], answer: "0" },
+{ question: "What is the sum of the first five natural numbers (1+2+3+4+5)?", options: ["10", "12", "15", "20"], answer: "15" },
+{ question: "How many degrees are there in a right angle?", options: ["45°", "90°", "120°", "180°"], answer: "90°" },
+{ question: "If a clock shows 3:15, what is the angle between the hour and minute hands?", options: ["0°", "37.5°", "45°", "90°"], answer: "37.5°" },
+{ question: "What is the largest two-digit prime number?", options: ["89", "97", "99", "91"], answer: "97" },
+{ question: "If a train travels 60 km in 1.5 hours, what is its speed?", options: ["30 km/h", "40 km/h", "50 km/h", "60 km/h"], answer: "40 km/h" }
+
+
+  
+    
+];
+
+let currentQuestion = 0;
+    let score = 0;
+    let timeLeft = 10;
+    let timer;
+
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const resultEl = document.getElementById("result");
+    const scoreEl = document.getElementById("score");
+    const timerEl = document.getElementById("timer");
+
+    function startTimer() {
+        timeLeft = 10;
+        timerEl.textContent = `Time Left: ${timeLeft}s`;
+        timer = setInterval(() => {
+            timeLeft--;
+            timerEl.textContent = `Time Left: ${timeLeft}s`;
+            if (timeLeft === 0) {
+                clearInterval(timer);
+                checkAnswer(null, true); // Indicating time up
+            }
+        }, 1000);
+    }
+
+    function loadQuestion() {
+        clearInterval(timer);
+        startTimer();
+
+        const q = quizData[currentQuestion];
+        questionEl.textContent = q.question;
+        questionEl.style.animation = "none";
+        void questionEl.offsetWidth;
+        questionEl.style.animation = "fadeIn 0.5s forwards";
+
+        optionsEl.innerHTML = "";
+        q.options.forEach((option, index) => {
+            const button = document.createElement("button");
+            button.textContent = option;
+            button.classList.add("option");
+            button.style.animationDelay = `${0.2 + index * 0.1}s`;
+            button.onclick = () => checkAnswer(option, false);
+            optionsEl.appendChild(button);
+        });
+    }
+
+    function checkAnswer(selected, timeUp) {
+        clearInterval(timer);
+
+        if (timeUp) {
+            resultEl.textContent = "Time's Up! The correct answer was: " + quizData[currentQuestion].answer;
+            resultEl.style.color = "orange";
+        } else if (selected === quizData[currentQuestion].answer) {
+            resultEl.textContent = "Correct!";
+            resultEl.style.color = "green";
+            score++;
+        } else {
+            resultEl.textContent = `Wrong! The correct answer was: ${quizData[currentQuestion].answer}`;
+            resultEl.style.color = "red";
+        }
+
+        resultEl.style.animation = "none";
+        void resultEl.offsetWidth;
+        resultEl.style.animation = "fadeIn 0.5s forwards";
+
+        scoreEl.textContent = `Score: ${score}`;
+
+        setTimeout(() => {
+            resultEl.textContent = "";
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                questionEl.textContent = "Quiz Completed!";
+                optionsEl.innerHTML = "";
+                timerEl.textContent = "";
+            }
+        }, 1500);
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>

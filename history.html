@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Quiz Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1> Quiz Game</h1>
+        <p class="timer" id="timer">Time Left: 10s</p>
+        <div id="quiz">
+            <p class="question" id="question"></p>
+            <div id="options"></div>
+        </div>
+        <p class="result" id="result"></p>
+        <p class="score" id="score">Score: 0</p>
+    </div>
+<script>
+    const quizData = [
+    { question: "Who was the first Mughal emperor of India?", options: ["Akbar", "Babur", "Shah Jahan", "Aurangzeb"], answer: "Babur" },
+{ question: "In which year did India gain independence from British rule?", options: ["1942", "1945", "1947", "1950"], answer: "1947" },
+{ question: "Who was the founder of the Maurya Empire?", options: ["Ashoka", "Chandragupta Maurya", "Harsha", "Kanishka"], answer: "Chandragupta Maurya" },
+{ question: "Which movement was launched by Mahatma Gandhi in 1942 demanding an end to British rule?", options: ["Non-Cooperation Movement", "Civil Disobedience Movement", "Quit India Movement", "Swadeshi Movement"], answer: "Quit India Movement" },
+{ question: "Who was the first President of independent India?", options: ["Dr. B.R. Ambedkar", "Dr. Rajendra Prasad", "Jawaharlal Nehru", "Sardar Patel"], answer: "Dr. Rajendra Prasad" },
+{ question: "Which famous battle in 1757 marked the beginning of British rule in India?", options: ["Battle of Plassey", "Battle of Panipat", "Battle of Buxar", "Battle of Haldighati"], answer: "Battle of Plassey" },
+{ question: "Who wrote the famous book 'Arthashastra'?", options: ["Kalidasa", "Chanakya", "Vishnu Sharma", "Banabhatta"], answer: "Chanakya" },
+{ question: "The Jallianwala Bagh massacre took place in which city?", options: ["Delhi", "Amritsar", "Mumbai", "Kolkata"], answer: "Amritsar" },
+{ question: "Who was the first Governor-General of independent India?", options: ["Lord Mountbatten", "C. Rajagopalachari", "Lord Wellesley", "Warren Hastings"], answer: "Lord Mountbatten" },
+{ question: "Which Indian leader is known as the 'Iron Man of India'?", options: ["Mahatma Gandhi", "Jawaharlal Nehru", "Sardar Patel", "Subhas Chandra Bose"], answer: "Sardar Patel" },
+{ question: "Who was the last Viceroy of British India?", options: ["Lord Mountbatten", "Lord Curzon", "Lord Dalhousie", "Lord Wellesley"], answer: "Lord Mountbatten" },
+{ question: "Which Indian freedom fighter gave the slogan 'Give me blood, and I will give you freedom'?", options: ["Mahatma Gandhi", "Subhas Chandra Bose", "Bhagat Singh", "Jawaharlal Nehru"], answer: "Subhas Chandra Bose" },
+{ question: "Who was the first woman ruler of India?", options: ["Razia Sultana", "Rani Lakshmibai", "Indira Gandhi", "Noor Jahan"], answer: "Razia Sultana" },
+{ question: "Which Indian ruler is known as the 'Tiger of Mysore'?", options: ["Tipu Sultan", "Hyder Ali", "Shivaji", "Ranjit Singh"], answer: "Tipu Sultan" },
+{ question: "Who was the first Indian to win a Nobel Prize?", options: ["C.V. Raman", "Rabindranath Tagore", "Mother Teresa", "Amartya Sen"], answer: "Rabindranath Tagore" },
+{ question: "Which battle in 1764 established British control over Bengal, Bihar, and Odisha?", options: ["Battle of Buxar", "Battle of Plassey", "Battle of Panipat", "Battle of Haldighati"], answer: "Battle of Buxar" },
+{ question: "Who was the leader of the 1857 Revolt in Kanpur?", options: ["Tatya Tope", "Rani Lakshmibai", "Nana Sahib", "Bahadur Shah II"], answer: "Nana Sahib" },
+{ question: "Which ancient university in India was destroyed by invaders in the 12th century?", options: ["Nalanda", "Takshashila", "Vikramashila", "Ujjain"], answer: "Nalanda" },
+{ question: "Who was the first Indian to travel in space?", options: ["Rakesh Sharma", "Kalpana Chawla", "Vikram Sarabhai", "Sunita Williams"], answer: "Rakesh Sharma" },
+{ question: "Who was the first Prime Minister of India?", options: ["Sardar Patel", "Mahatma Gandhi", "Jawaharlal Nehru", "Rajendra Prasad"], answer: "Jawaharlal Nehru" }
+
+
+    ]
+
+
+    let currentQuestion = 0;
+    let score = 0;
+    let timeLeft = 10;
+    let timer;
+
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const resultEl = document.getElementById("result");
+    const scoreEl = document.getElementById("score");
+    const timerEl = document.getElementById("timer");
+
+    function startTimer() {
+        timeLeft = 10;
+        timerEl.textContent = `Time Left: ${timeLeft}s`;
+        timer = setInterval(() => {
+            timeLeft--;
+            timerEl.textContent = `Time Left: ${timeLeft}s`;
+            if (timeLeft === 0) {
+                clearInterval(timer);
+                checkAnswer(null, true); // Indicating time up
+            }
+        }, 1000);
+    }
+
+    function loadQuestion() {
+        clearInterval(timer);
+        startTimer();
+
+        const q = quizData[currentQuestion];
+        questionEl.textContent = q.question;
+        questionEl.style.animation = "none";
+        void questionEl.offsetWidth;
+        questionEl.style.animation = "fadeIn 0.5s forwards";
+
+        optionsEl.innerHTML = "";
+        q.options.forEach((option, index) => {
+            const button = document.createElement("button");
+            button.textContent = option;
+            button.classList.add("option");
+            button.style.animationDelay = `${0.2 + index * 0.1}s`;
+            button.onclick = () => checkAnswer(option, false);
+            optionsEl.appendChild(button);
+        });
+    }
+
+    function checkAnswer(selected, timeUp) {
+        clearInterval(timer);
+
+        if (timeUp) {
+            resultEl.textContent = "Time's Up! The correct answer was: " + quizData[currentQuestion].answer;
+            resultEl.style.color = "orange";
+        } else if (selected === quizData[currentQuestion].answer) {
+            resultEl.textContent = "Correct!";
+            resultEl.style.color = "green";
+            score++;
+        } else {
+            resultEl.textContent = `Wrong! The correct answer was: ${quizData[currentQuestion].answer}`;
+            resultEl.style.color = "red";
+        }
+
+        resultEl.style.animation = "none";
+        void resultEl.offsetWidth;
+        resultEl.style.animation = "fadeIn 0.5s forwards";
+
+        scoreEl.textContent = `Score: ${score}`;
+
+        setTimeout(() => {
+            resultEl.textContent = "";
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                questionEl.textContent = "Quiz Completed!";
+                optionsEl.innerHTML = "";
+                timerEl.textContent = "";
+            }
+        }, 1500);
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>

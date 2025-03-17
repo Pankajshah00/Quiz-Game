@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Quiz Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1> Quiz Game</h1>
+        <p class="timer" id="timer">Time Left: 10s</p>
+        <div id="quiz">
+            <p class="question" id="question"></p>
+            <div id="options"></div>
+        </div>
+        <p class="result" id="result"></p>
+        <p class="score" id="score">Score: 0</p>
+    </div>
+<script>
+    const quizData = [
+    { question: "What is the chemical symbol for water?", options: ["H2O", "O2", "CO2", "H2"], answer: "H2O" },
+{ question: "What planet is known as the Red Planet?", options: ["Earth", "Venus", "Mars", "Jupiter"], answer: "Mars" },
+{ question: "Which gas do plants absorb from the atmosphere for photosynthesis?", options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"], answer: "Carbon Dioxide" },
+{ question: "What is the powerhouse of the cell?", options: ["Nucleus", "Mitochondria", "Ribosome", "Golgi Apparatus"], answer: "Mitochondria" },
+{ question: "Which part of the human body produces insulin?", options: ["Liver", "Pancreas", "Kidney", "Heart"], answer: "Pancreas" },
+{ question: "What is the speed of light in a vacuum?", options: ["3,00,000 km/s", "1,50,000 km/s", "5,00,000 km/s", "2,00,000 km/s"], answer: "3,00,000 km/s" },
+{ question: "What is the chemical symbol for gold?", options: ["Ag", "Au", "Pb", "Fe"], answer: "Au" },
+{ question: "Which vitamin is produced by the human body when exposed to sunlight?", options: ["Vitamin A", "Vitamin B", "Vitamin C", "Vitamin D"], answer: "Vitamin D" },
+{ question: "What is the process by which plants make their own food?", options: ["Respiration", "Fermentation", "Photosynthesis", "Transpiration"], answer: "Photosynthesis" },
+{ question: "Who developed the theory of relativity?", options: ["Isaac Newton", "Albert Einstein", "Galileo Galilei", "Nikola Tesla"], answer: "Albert Einstein" },
+{ question: "What is the chemical formula of table salt?", options: ["NaCl", "KCl", "CaCO3", "H2SO4"], answer: "NaCl" },
+{ question: "Which organ in the human body filters blood?", options: ["Lungs", "Liver", "Kidneys", "Heart"], answer: "Kidneys" },
+{ question: "What is the SI unit of force?", options: ["Watt", "Newton", "Joule", "Pascal"], answer: "Newton" },
+{ question: "Which element is most abundant in Earth's crust?", options: ["Oxygen", "Silicon", "Iron", "Aluminum"], answer: "Oxygen" },
+{ question: "What type of blood cells help fight infections in the human body?", options: ["Red Blood Cells", "Platelets", "White Blood Cells", "Plasma"], answer: "White Blood Cells" },
+{ question: "Which law states that for every action, there is an equal and opposite reaction?", options: ["Newton's First Law", "Newton's Second Law", "Newton's Third Law", "Law of Gravity"], answer: "Newton's Third Law" },
+{ question: "Which metal is a liquid at room temperature?", options: ["Gold", "Mercury", "Aluminum", "Lead"], answer: "Mercury" },
+{ question: "Which part of the human brain controls balance and coordination?", options: ["Cerebrum", "Cerebellum", "Medulla", "Hypothalamus"], answer: "Cerebellum" },
+{ question: "What is the speed of sound in air?", options: ["150 m/s", "343 m/s", "500 m/s", "1200 m/s"], answer: "343 m/s" },
+{ question: "Which gas is essential for human respiration?", options: ["Nitrogen", "Oxygen", "Carbon Dioxide", "Hydrogen"], answer: "Oxygen" }
+
+    ]
+
+    let currentQuestion = 0;
+    let score = 0;
+    let timeLeft = 10;
+    let timer;
+
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const resultEl = document.getElementById("result");
+    const scoreEl = document.getElementById("score");
+    const timerEl = document.getElementById("timer");
+
+    function startTimer() {
+        timeLeft = 10;
+        timerEl.textContent = `Time Left: ${timeLeft}s`;
+        timer = setInterval(() => {
+            timeLeft--;
+            timerEl.textContent = `Time Left: ${timeLeft}s`;
+            if (timeLeft === 0) {
+                clearInterval(timer);
+                checkAnswer(null, true); // Indicating time up
+            }
+        }, 1000);
+    }
+
+    function loadQuestion() {
+        clearInterval(timer);
+        startTimer();
+
+        const q = quizData[currentQuestion];
+        questionEl.textContent = q.question;
+        questionEl.style.animation = "none";
+        void questionEl.offsetWidth;
+        questionEl.style.animation = "fadeIn 0.5s forwards";
+
+        optionsEl.innerHTML = "";
+        q.options.forEach((option, index) => {
+            const button = document.createElement("button");
+            button.textContent = option;
+            button.classList.add("option");
+            button.style.animationDelay = `${0.2 + index * 0.1}s`;
+            button.onclick = () => checkAnswer(option, false);
+            optionsEl.appendChild(button);
+        });
+    }
+
+    function checkAnswer(selected, timeUp) {
+        clearInterval(timer);
+
+        if (timeUp) {
+            resultEl.textContent = "Time's Up! The correct answer was: " + quizData[currentQuestion].answer;
+            resultEl.style.color = "orange";
+        } else if (selected === quizData[currentQuestion].answer) {
+            resultEl.textContent = "Correct!";
+            resultEl.style.color = "green";
+            score++;
+        } else {
+            resultEl.textContent = `Wrong! The correct answer was: ${quizData[currentQuestion].answer}`;
+            resultEl.style.color = "red";
+        }
+
+        resultEl.style.animation = "none";
+        void resultEl.offsetWidth;
+        resultEl.style.animation = "fadeIn 0.5s forwards";
+
+        scoreEl.textContent = `Score: ${score}`;
+
+        setTimeout(() => {
+            resultEl.textContent = "";
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                questionEl.textContent = "Quiz Completed!";
+                optionsEl.innerHTML = "";
+                timerEl.textContent = "";
+            }
+        }, 1500);
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>
